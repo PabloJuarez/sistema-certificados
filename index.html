@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de Certificados</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; }
+    form { display: grid; gap: 10px; margin-bottom: 30px; background: #f4f4f5; padding: 20px; border-radius: 8px; }
+    input, button { padding: 10px; font-size: 15px; border: 1px solid #ccc; border-radius: 4px; }
+    button { background: #0066cc; color: white; border: none; font-weight: bold; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+    th { background: #f4f4f5; }
+  </style>
+</head>
+<body>
+  <h2>Registrar Nuevo Certificado</h2>
+  <form id="cert-form">
+    <input type="text" id="nombre" placeholder="Nombre del certificado (ej. Licencia Software)" required>
+    <label>Fecha de Creación:</label>
+    <input type="date" id="fecha_creacion" required>
+    <label>Fecha de Vencimiento:</label>
+    <input type="date" id="fecha_vencimiento" required>
+    <input type="email" id="email" placeholder="Correo para recibir la alerta" required>
+    <button type="submit">Guardar Certificado</button>
+  </form>
+
+  <h2>Certificados Guardados</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Certificado</th>
+        <th>Vencimiento</th>
+        <th>Notificación</th>
+      </tr>
+    </thead>
+    <tbody id="cert-table-body"></tbody>
+  </table>
+
+  <script src="app.js"></script>
+</body>
+</html>
