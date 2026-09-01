@@ -5,17 +5,21 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 exports.handler = async () => {
-  const fechaFormateada = new Date().toISOString().split('T')[0];
+  // Definir margen de aviso: 7 días antes del vencimiento
+  const diasAntes = 7;
+  const fechaObjetivo = new Date();
+  fechaObjetivo.setDate(fechaObjetivo.getDate() + diasAntes);
+  const fechaFormateada = fechaObjetivo.toISOString().split('T')[0];
 
-  // Buscar certificados que vencen hoy (o días pasados con .lte)
+  // Buscar certificados que vencen exactamente en 7 días y no han sido notificados
   const { data: certs, error } = await supabase
     .from('certificados')
     .select('*')
-    .lte('fecha_vencimiento', fechaFormateada)
+    .eq('fecha_vencimiento', fechaFormateada)
     .eq('notificado', false);
 
   if (error || !certs || certs.length === 0) {
-    return { statusCode: 200, body: 'Revisión finalizada: No hay vencimientos pendientes.' };
+    return { statusCode: 200, body: 'Revisión finalizada: No hay vencimientos dentro de 7 días.' };
   }
 
   for (const cert of certs) {
@@ -24,8 +28,8 @@ exports.handler = async () => {
       await resend.emails.send({
         from: 'onboarding@resend.dev',
         to: cert.email_notificacion,
-        subject: `⚠️ ALERTA: Tu certificado "${cert.nombre}" vence pronto`,
-        html: `<p>Hola, el certificado <strong>${cert.nombre}</strong> vence el día de hoy (<strong>${cert.fecha_vencimiento}</strong>).</p>`
+        subject: `⚠️ ALERTA: Tu certificado "${cert.nombre}" vence en 7 días`,
+        html: `<p>Hola, el certificado <strong>${cert.nombre}</strong> vencerá el <strong>${cert.fecha_vencimiento}</strong>. Quedan 7 días para renovarlo.</p>`
       });
 
       // Marcar en la base de datos como enviado
@@ -35,5 +39,5 @@ exports.handler = async () => {
     }
   }
 
-  return { statusCode: 200, body: `Proceso completado para ${certs.length} registros.` };
+  return { statusCode: 200, body: `Se enviaron ${certs.length} alertas.` };
 };
