@@ -9,13 +9,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Inter', sans-serif; }
-    .modulo-seccion { display: none; }
-    .modulo-seccion.activo { display: block; }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex">
 
-  <!-- BARRA LATERAL / SIDEBAR -->
+  <!-- SIDEBAR -->
   <aside class="w-64 bg-slate-900 text-slate-300 min-h-screen flex flex-col justify-between p-4 flex-shrink-0">
     <div>
       <div class="flex items-center gap-3 px-3 py-4 border-b border-slate-800 mb-6">
@@ -26,18 +24,18 @@
         </div>
       </div>
 
-      <!-- Menú de Módulos Interactivos -->
-      <nav class="space-y-1" id="menu-nav">
-        <button onclick="cambiarModulo('panel')" id="btn-panel" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-600 text-white font-medium text-sm transition">
+      <!-- Menú con listeners asignados directamente -->
+      <nav class="space-y-1">
+        <button type="button" data-target="modulo-panel" class="btn-nav w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-600 text-white font-medium text-sm transition">
           📊 Panel Principal
         </button>
-        <button onclick="cambiarModulo('certificados')" id="btn-certificados" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white text-sm font-medium transition">
+        <button type="button" data-target="modulo-certificados" class="btn-nav w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white text-sm font-medium transition">
           📂 Certificados
         </button>
-        <button onclick="cambiarModulo('usuarios')" id="btn-usuarios" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white text-sm font-medium transition">
+        <button type="button" data-target="modulo-usuarios" class="btn-nav w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white text-sm font-medium transition">
           👥 Usuarios
         </button>
-        <button onclick="cambiarModulo('configuracion')" id="btn-configuracion" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white text-sm font-medium transition">
+        <button type="button" data-target="modulo-configuracion" class="btn-nav w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white text-sm font-medium transition">
           ⚙️ Configuración
         </button>
       </nav>
@@ -48,23 +46,22 @@
     </div>
   </aside>
 
-  <!-- CONTENIDO PRINCIPAL -->
+  <!-- CONTENIDO -->
   <div class="flex-1 flex flex-col">
     
     <header class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center">
-      <h2 class="text-xl font-bold text-slate-900" id="titulo-modulo">Panel Principal</h2>
+      <h2 class="text-xl font-bold text-slate-900" id="header-titulo">Panel Principal</h2>
       <div class="flex items-center gap-3">
         <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
         <span class="text-sm font-medium text-slate-600">Sistema Activo</span>
       </div>
     </header>
 
-    <main class="p-8 space-y-8 overflow-y-auto">
+    <main class="p-8">
 
       <!-- MÓDULO 1: PANEL PRINCIPAL -->
-      <div id="modulo-panel" class="modulo-seccion activo space-y-8">
-        
-        <!-- Métricas -->
+      <div id="modulo-panel" class="seccion-modulo space-y-8">
+        <!-- Tarjetas Métricas -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="bg-blue-600 text-white p-6 rounded-xl shadow-sm flex justify-between items-center">
             <div>
@@ -142,21 +139,21 @@
       </div>
 
       <!-- MÓDULO 2: CERTIFICADOS -->
-      <div id="modulo-certificados" class="modulo-seccion bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-        <h3 class="text-lg font-bold text-slate-900 mb-2">Módulo de Certificados</h3>
-        <p class="text-sm text-slate-600">Vista detallada y filtros avanzados de certificados.</p>
+      <div id="modulo-certificados" class="seccion-modulo hidden bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <h3 class="text-lg font-bold text-slate-900 mb-2">📂 Módulo de Certificados</h3>
+        <p class="text-sm text-slate-600">Aquí podrás ver reportes detallados y descargar el historial de certificados.</p>
       </div>
 
       <!-- MÓDULO 3: USUARIOS -->
-      <div id="modulo-usuarios" class="modulo-seccion bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-        <h3 class="text-lg font-bold text-slate-900 mb-2">Gestión de Usuarios</h3>
-        <p class="text-sm text-slate-600">Administración de accesos y permisos del sistema.</p>
+      <div id="modulo-usuarios" class="seccion-modulo hidden bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <h3 class="text-lg font-bold text-slate-900 mb-2">👥 Gestión de Usuarios</h3>
+        <p class="text-sm text-slate-600">Administra los accesos de los usuarios del sistema.</p>
       </div>
 
       <!-- MÓDULO 4: CONFIGURACIÓN -->
-      <div id="modulo-configuracion" class="modulo-seccion bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-        <h3 class="text-lg font-bold text-slate-900 mb-2">Configuración del Sistema</h3>
-        <p class="text-sm text-slate-600">Parámetros globales de alertas y correos SMTP.</p>
+      <div id="modulo-configuracion" class="seccion-modulo hidden bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <h3 class="text-lg font-bold text-slate-900 mb-2">⚙️ Configuración del Sistema</h3>
+        <p class="text-sm text-slate-600">Ajusta los parámetros globales de envío de correos y alertas.</p>
       </div>
 
     </main>
@@ -164,34 +161,35 @@
 
   <script src="app.js"></script>
   <script>
-    // Función para alternar entre módulos visualmente
-    function cambiarModulo(modulo) {
-      // Ocultar todas las secciones
-      document.querySelectorAll('.modulo-seccion').forEach(sec => sec.classList.remove('activo'));
-      
-      // Quitar estilo activo de los botones
-      const botones = ['panel', 'certificados', 'usuarios', 'configuracion'];
-      botones.forEach(b => {
-        const btn = document.getElementById(`btn-${b}`);
-        btn.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white text-sm font-medium transition";
+    // Script JS dedicado exclusivamente al cambio de vistas sin interferencias
+    document.addEventListener('DOMContentLoaded', () => {
+      const navButtons = document.querySelectorAll('.btn-nav');
+      const modulos = document.querySelectorAll('.seccion-modulo');
+      const headerTitulo = document.getElementById('header-titulo');
+
+      navButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetId = btn.getAttribute('data-target');
+
+          // Ocultar todas las secciones
+          modulos.forEach(mod => mod.classList.add('hidden'));
+
+          // Mostrar la sección seleccionada
+          document.getElementById(targetId).classList.remove('hidden');
+
+          // Resetear estilos de botones
+          navButtons.forEach(b => {
+            b.className = "btn-nav w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white text-sm font-medium transition";
+          });
+
+          // Estilo activo al botón clickeado
+          btn.className = "btn-nav w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-600 text-white font-medium text-sm transition";
+
+          // Actualizar título del header
+          headerTitulo.textContent = btn.innerText.trim();
+        });
       });
-
-      // Activar la sección seleccionada
-      document.getElementById(`modulo-${modulo}`).classList.add('activo');
-
-      // Resaltar botón seleccionado
-      const btnActivo = document.getElementById(`btn-${modulo}`);
-      btnActivo.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-600 text-white font-medium text-sm transition";
-
-      // Actualizar título de cabecera
-      const titulos = {
-        panel: 'Panel Principal',
-        certificados: 'Módulo de Certificados',
-        usuarios: 'Gestión de Usuarios',
-        configuracion: 'Configuración del Sistema'
-      };
-      document.getElementById('titulo-modulo').textContent = titulos[modulo];
-    }
+    });
   </script>
 </body>
 </html>
