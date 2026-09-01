@@ -6,10 +6,8 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 exports.handler = async () => {
   // Definir margen de aviso: 7 días antes del vencimiento
-  const diasAntes = 7;
-  const fechaObjetivo = new Date();
-  fechaObjetivo.setDate(fechaObjetivo.getDate() + diasAntes);
-  const fechaFormateada = fechaObjetivo.toISOString().split('T')[0];
+
+  const fechaFormateada = new Date().toISOString().split('T')[0];
 
   // Buscar certificados que vencen en 7 días exactos
   const { data: certs, error } = await supabase
