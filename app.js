@@ -30,10 +30,15 @@ async function verificarSesion() {
     document.getElementById('user-display-email').textContent = usuarioActualPerfil.nombre || session.user.email;
     document.getElementById('user-display-rol').textContent = usuarioActualPerfil.rol;
 
-    if (usuarioActualPerfil.rol !== 'Administrador') {
-      document.getElementById('nav-btn-usuarios').classList.add('hidden');
-    } else {
+    const contenedorFormCert = document.getElementById('contenedor-form-certificado');
+
+    if (usuarioActualPerfil.rol === 'Administrador') {
       document.getElementById('nav-btn-usuarios').classList.remove('hidden');
+      if (contenedorFormCert) contenedorFormCert.classList.remove('hidden');
+    } else {
+      // Si es Operador
+      document.getElementById('nav-btn-usuarios').classList.add('hidden');
+      if (contenedorFormCert) contenedorFormCert.classList.add('hidden');
     }
 
     cargarCertificados();
@@ -96,7 +101,7 @@ async function cargarCertificados() {
   }
 }
 
-certForm.addEventListener('submit', async (e) => {
+certForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const nuevoCertificado = {
     nombre: document.getElementById('nombre').value,
@@ -135,7 +140,7 @@ async function cargarUsuarios() {
   }
 }
 
-userForm.addEventListener('submit', async (e) => {
+userForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const nombre = document.getElementById('user-nombre').value;
   const email = document.getElementById('user-email').value;
