@@ -16,7 +16,7 @@ function actualizarTarjetas(data) {
   document.getElementById('stat-notificados').textContent = notificados;
 }
 
-// 2. Cargar registros y renderizar en la tabla
+// 2. Cargar registros y renderizar en la tabla del módulo Certificados
 async function cargarCertificados() {
   const { data, error } = await _supabase.from('certificados').select('*');
   if (error) return console.error(error);
@@ -36,7 +36,7 @@ async function cargarCertificados() {
   `).join('');
 }
 
-// 3. Registrar un nuevo certificado
+// 3. Registrar un nuevo certificado y limpiar campos
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   const nuevoCertificado = {
@@ -50,12 +50,13 @@ form.addEventListener('submit', async (e) => {
   if (!error) {
     form.reset();
     cargarCertificados();
+    alert('Certificado guardado con éxito.');
   } else {
     alert('Error al guardar certificado en la base de datos.');
   }
 });
 
-// 4. Ejecutar chequeo manual llamando a la Netlify Function desde el botón
+// 4. Ejecutar chequeo manual llamando a la Netlify Function
 async function ejecutarChequeoManual() {
   const btn = document.getElementById('btn-ejecutar-cron');
   const textoOriginal = btn.innerHTML;
