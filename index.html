@@ -24,7 +24,6 @@
         </div>
       </div>
 
-      <!-- Menú de Módulos Interactivos -->
       <nav class="space-y-1">
         <button type="button" data-target="modulo-panel" class="btn-nav w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-600 text-white font-medium text-sm transition">
           📊 Panel Principal
@@ -53,7 +52,6 @@
       <h2 class="text-xl font-bold text-slate-900" id="header-titulo">Panel Principal</h2>
       
       <div class="flex items-center gap-4">
-        <!-- Botón para ejecutar el chequeo manual -->
         <button id="btn-ejecutar-cron" onclick="ejecutarChequeoManual()" 
           class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold py-2 px-3.5 rounded-lg shadow-sm transition">
           ⚡ Ejecutar Alertas
@@ -70,8 +68,6 @@
 
       <!-- MÓDULO 1: PANEL PRINCIPAL -->
       <div id="modulo-panel" class="seccion-modulo space-y-8">
-        
-        <!-- Tarjetas Métricas -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="bg-blue-600 text-white p-6 rounded-xl shadow-sm flex justify-between items-center">
             <div>
@@ -98,7 +94,6 @@
           </div>
         </div>
 
-        <!-- Formulario de Registro -->
         <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
           <h3 class="text-base font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">
             ➕ Registrar Nuevo Certificado
@@ -127,17 +122,14 @@
             </button>
           </form>
         </section>
-
       </div>
 
-      <!-- MÓDULO 2: CERTIFICADOS (Tabla Movida Aquí) -->
+      <!-- MÓDULO 2: CERTIFICADOS -->
       <div id="modulo-certificados" class="seccion-modulo hidden space-y-6">
         <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-            <div>
-              <h3 class="text-base font-bold text-slate-900">Listado de Certificados Registrados</h3>
-              <p class="text-xs text-slate-500 mt-0.5">Histórico completo de certificados y su estado de notificación</p>
-            </div>
+          <div class="p-6 border-b border-slate-100">
+            <h3 class="text-base font-bold text-slate-900">Listado de Certificados Registrados</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Histórico completo de certificados y su estado de notificación</p>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-sm">
@@ -154,12 +146,60 @@
         </section>
       </div>
 
-      <!-- MÓDULOS SECUNDARIOS -->
-      <div id="modulo-usuarios" class="seccion-modulo hidden bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-        <h3 class="text-lg font-bold text-slate-900 mb-2">👥 Gestión de Usuarios</h3>
-        <p class="text-sm text-slate-600">Administración de accesos del sistema.</p>
+      <!-- MÓDULO 3: USUARIOS -->
+      <div id="modulo-usuarios" class="seccion-modulo hidden space-y-8">
+        <!-- Formulario Crear Usuario -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <h3 class="text-base font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">
+            👤 Registrar Nuevo Usuario
+          </h3>
+          <form id="user-form" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Nombre Completo</label>
+                <input type="text" id="user-nombre" placeholder="Ej. Juan Pérez" required class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none text-sm">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Correo Electrónico</label>
+                <input type="email" id="user-email" placeholder="usuario@ejemplo.com" required class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none text-sm">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Rol de Acceso</label>
+              <select id="user-rol" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none text-sm bg-white">
+                <option value="Operador">Operador</option>
+                <option value="Administrador">Administrador</option>
+                <option value="Auditor">Auditor</option>
+              </select>
+            </div>
+            <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 px-6 rounded-lg shadow transition text-sm">
+              Crear Usuario
+            </button>
+          </form>
+        </section>
+
+        <!-- Tabla Usuarios -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="p-6 border-b border-slate-100">
+            <h3 class="text-base font-bold text-slate-900">Usuarios Registrados</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold text-xs uppercase tracking-wider">
+                  <th class="py-3 px-6">Nombre</th>
+                  <th class="py-3 px-6">Correo</th>
+                  <th class="py-3 px-6">Rol</th>
+                  <th class="py-3 px-6">Estado</th>
+                </tr>
+              </thead>
+              <tbody id="user-table-body" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </section>
       </div>
 
+      <!-- MÓDULO 4: CONFIGURACIÓN -->
       <div id="modulo-configuracion" class="seccion-modulo hidden bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
         <h3 class="text-lg font-bold text-slate-900 mb-2">⚙️ Configuración del Sistema</h3>
         <p class="text-sm text-slate-600">Ajustes globales de notificaciones.</p>
@@ -170,7 +210,6 @@
 
   <script src="app.js"></script>
   <script>
-    // Navegación entre pestañas de módulos
     document.addEventListener('DOMContentLoaded', () => {
       const navButtons = document.querySelectorAll('.btn-nav');
       const modulos = document.querySelectorAll('.seccion-modulo');

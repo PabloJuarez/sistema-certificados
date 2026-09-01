@@ -2,10 +2,14 @@ const SUPABASE_URL = 'https://yizqjtuyfdfqlqspijgs.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_uAnHdms0QyDQq2HZjEs5Sg_7z4Vklt0';
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const form = document.getElementById('cert-form');
-const tableBody = document.getElementById('cert-table-body');
+// Elementos DOM
+const certForm = document.getElementById('cert-form');
+const certTableBody = document.getElementById('cert-table-body');
+const userForm = document.getElementById('user-form');
+const userTableBody = document.getElementById('user-table-body');
 
-// 1. Función para actualizar las tarjetas de métricas
+// --- SECCIÓN CERTIFICADOS ---
+
 function actualizarTarjetas(data) {
   const total = data.length;
   const pendientes = data.filter(c => !c.notificado).length;
@@ -16,14 +20,13 @@ function actualizarTarjetas(data) {
   document.getElementById('stat-notificados').textContent = notificados;
 }
 
-// 2. Cargar registros y renderizar en la tabla del módulo Certificados
 async function cargarCertificados() {
   const { data, error } = await _supabase.from('certificados').select('*');
   if (error) return console.error(error);
 
   actualizarTarjetas(data);
 
-  tableBody.innerHTML = data.map(c => `
+  certTableBody.innerHTML = data.map(c => `
     <tr class="hover:bg-slate-50 transition">
       <td class="py-3 px-6 font-medium text-slate-800">${c.nombre}</td>
       <td class="py-3 px-6 text-slate-600">${c.fecha_vencimiento}</td>
@@ -36,8 +39,7 @@ async function cargarCertificados() {
   `).join('');
 }
 
-// 3. Registrar un nuevo certificado y limpiar campos
-form.addEventListener('submit', async (e) => {
+certForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const nuevoCertificado = {
     nombre: document.getElementById('nombre').value,
@@ -48,7 +50,7 @@ form.addEventListener('submit', async (e) => {
 
   const { error } = await _supabase.from('certificados').insert([nuevoCertificado]);
   if (!error) {
-    form.reset();
+    certForm.reset();
     cargarCertificados();
     alert('Certificado guardado con éxito.');
   } else {
@@ -56,7 +58,46 @@ form.addEventListener('submit', async (e) => {
   }
 });
 
-// 4. Ejecutar chequeo manual llamando a la Netlify Function
+// --- SECCIÓN USUARIOS ---
+
+async function cargarUsuarios() {
+  const { data, error } = await _supabase.from('usuarios').select('*');
+  if (error) return console.error(error);
+
+  userTableBody.innerHTML = data.map(u => `
+    <tr class="hover:bg-slate-50 transition">
+      <td class="py-3 px-6 font-medium text-slate-800">${u.nombre}</td>
+      <td class="py-3 px-6 text-slate-600">${u.email}</td>
+      <td class="py-3 px-6">
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200">${u.rol}</span>
+      </td>
+      <td class="py-3 px-6">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">● ${u.estado}</span>
+      </td>
+    </tr>
+  `).join('');
+}
+
+userForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const nuevoUsuario = {
+    nombre: document.getElementById('user-nombre').value,
+    email: document.getElementById('user-email').value,
+    rol: document.getElementById('user-rol').value
+  };
+
+  const { error } = await _supabase.from('usuarios').insert([nuevoUsuario]);
+  if (!error) {
+    userForm.reset();
+    cargarUsuarios();
+    alert('Usuario creado con éxito.');
+  } else {
+    alert('Error al guardar el usuario o el correo ya existe.');
+  }
+});
+
+// --- EJECUCIÓN MANUAL ALERTAS ---
+
 async function ejecutarChequeoManual() {
   const btn = document.getElementById('btn-ejecutar-cron');
   const textoOriginal = btn.innerHTML;
@@ -69,8 +110,6 @@ async function ejecutarChequeoManual() {
     const data = await res.text();
 
     alert(data && data.trim() !== '' ? `Respuesta: ${data}` : 'Alertas procesadas correctamente.');
-    
-    // Fuerza la recarga completa de la página del navegador
     window.location.reload();
   } catch (error) {
     console.error('Error al ejecutar la función:', error);
@@ -80,5 +119,6 @@ async function ejecutarChequeoManual() {
   }
 }
 
-// Inicializar la carga de datos
+// Cargas iniciales
 cargarCertificados();
+cargarUsuarios();
