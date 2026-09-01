@@ -23,7 +23,6 @@ async function verificarSesion() {
     pantallaLogin.classList.add('hidden');
     pantallaApp.classList.remove('hidden');
 
-    // Obtener datos del perfil
     const { data: perfil } = await _supabase.from('perfiles').select('*').eq('id', session.user.id).single();
     usuarioActualPerfil = perfil || { nombre: session.user.email, rol: 'Operador' };
 
@@ -32,38 +31,26 @@ async function verificarSesion() {
 
     const contenedorFormCert = document.getElementById('contenedor-form-certificado');
 
-    // Botones de la barra lateral
     const navPanel = document.getElementById('nav-btn-panel');
     const navCertificados = document.getElementById('nav-btn-certificados');
     const navUsuarios = document.getElementById('nav-btn-usuarios');
     const navConfiguracion = document.getElementById('nav-btn-configuracion');
 
     if (usuarioActualPerfil.rol === 'Administrador') {
-      // El Administrador ve todas las secciones
+      // Mostrar todo al administrador
       if (navPanel) navPanel.classList.remove('hidden');
-      if (navCertificados) navCertificados.classList.remove('hidden');
       if (navUsuarios) navUsuarios.classList.remove('hidden');
       if (navConfiguracion) navConfiguracion.classList.remove('hidden');
-
       if (contenedorFormCert) contenedorFormCert.classList.remove('hidden');
 
-      // Abre por defecto el Panel Principal
       if (navPanel) navPanel.click();
-
       cargarCertificados();
       cargarUsuarios();
     } else {
-      // El Operador SÓLO ve Certificados
-      if (navPanel) navPanel.classList.add('hidden');
-      if (navUsuarios) navUsuarios.classList.add('hidden');
-      if (navConfiguracion) navConfiguracion.classList.add('hidden');
-      if (navCertificados) navCertificados.classList.remove('hidden');
-
+      // El operador se queda únicamente con Certificados (los demás botones ya están ocultos por el HTML)
       if (contenedorFormCert) contenedorFormCert.classList.add('hidden');
 
-      // Abre por defecto la pantalla de Certificados
       if (navCertificados) navCertificados.click();
-
       cargarCertificados();
     }
   } else {
