@@ -32,17 +32,40 @@ async function verificarSesion() {
 
     const contenedorFormCert = document.getElementById('contenedor-form-certificado');
 
-    if (usuarioActualPerfil.rol === 'Administrador') {
-      document.getElementById('nav-btn-usuarios').classList.remove('hidden');
-      if (contenedorFormCert) contenedorFormCert.classList.remove('hidden');
-    } else {
-      // Si es Operador
-      document.getElementById('nav-btn-usuarios').classList.add('hidden');
-      if (contenedorFormCert) contenedorFormCert.classList.add('hidden');
-    }
+    // Botones de la barra lateral
+    const navPanel = document.getElementById('nav-btn-panel');
+    const navCertificados = document.getElementById('nav-btn-certificados');
+    const navUsuarios = document.getElementById('nav-btn-usuarios');
+    const navConfiguracion = document.getElementById('nav-btn-configuracion');
 
-    cargarCertificados();
-    if (usuarioActualPerfil.rol === 'Administrador') cargarUsuarios();
+    if (usuarioActualPerfil.rol === 'Administrador') {
+      // El Administrador ve todas las secciones
+      if (navPanel) navPanel.classList.remove('hidden');
+      if (navCertificados) navCertificados.classList.remove('hidden');
+      if (navUsuarios) navUsuarios.classList.remove('hidden');
+      if (navConfiguracion) navConfiguracion.classList.remove('hidden');
+
+      if (contenedorFormCert) contenedorFormCert.classList.remove('hidden');
+
+      // Abre por defecto el Panel Principal
+      if (navPanel) navPanel.click();
+
+      cargarCertificados();
+      cargarUsuarios();
+    } else {
+      // El Operador SÓLO ve Certificados
+      if (navPanel) navPanel.classList.add('hidden');
+      if (navUsuarios) navUsuarios.classList.add('hidden');
+      if (navConfiguracion) navConfiguracion.classList.add('hidden');
+      if (navCertificados) navCertificados.classList.remove('hidden');
+
+      if (contenedorFormCert) contenedorFormCert.classList.add('hidden');
+
+      // Abre por defecto la pantalla de Certificados
+      if (navCertificados) navCertificados.click();
+
+      cargarCertificados();
+    }
   } else {
     pantallaLogin.classList.remove('hidden');
     pantallaApp.classList.add('hidden');
@@ -133,7 +156,13 @@ async function cargarUsuarios() {
       <tr class="hover:bg-slate-50 transition">
         <td class="py-3 px-6 font-medium text-slate-800">${u.nombre}</td>
         <td class="py-3 px-6">
-          <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200">${u.rol}</span>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold ${
+            u.rol === 'Administrador' 
+              ? 'bg-blue-100 text-blue-800 border border-blue-200' 
+              : 'bg-slate-100 text-slate-700 border border-slate-200'
+          }">
+            ${u.rol === 'Administrador' ? '🛡️ ' : '👤 '}${u.rol}
+          </span>
         </td>
       </tr>
     `).join('');
