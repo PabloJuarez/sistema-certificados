@@ -68,12 +68,13 @@ async function ejecutarChequeoManual() {
     const res = await fetch('/.netlify/functions/check-expirations');
     const data = await res.text();
 
-    alert(`Respuesta del servidor: ${data}`);
-    cargarCertificados();
+    alert(data && data.trim() !== '' ? `Respuesta: ${data}` : 'Alertas procesadas correctamente.');
+    
+    // Fuerza la recarga completa de la página del navegador
+    window.location.reload();
   } catch (error) {
     console.error('Error al ejecutar la función:', error);
     alert('Hubo un error al intentar enviar las alertas.');
-  } finally {
     btn.disabled = false;
     btn.innerHTML = textoOriginal;
   }
