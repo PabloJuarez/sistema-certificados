@@ -9,14 +9,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Inter', sans-serif; }
+    .modulo-seccion { display: none; }
+    .modulo-seccion.activo { display: block; }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex">
 
-  <!-- 1. BARRA LATERAL / SIDEBAR -->
+  <!-- BARRA LATERAL / SIDEBAR -->
   <aside class="w-64 bg-slate-900 text-slate-300 min-h-screen flex flex-col justify-between p-4 flex-shrink-0">
     <div>
-      <!-- Brand Logo -->
       <div class="flex items-center gap-3 px-3 py-4 border-b border-slate-800 mb-6">
         <div class="bg-blue-600 text-white font-bold p-2 rounded-lg text-lg">📜</div>
         <div>
@@ -25,138 +26,172 @@
         </div>
       </div>
 
-      <!-- Menú de Módulos -->
-      <nav class="space-y-1">
-        <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-600 text-white font-medium text-sm transition">
+      <!-- Menú de Módulos Interactivos -->
+      <nav class="space-y-1" id="menu-nav">
+        <button onclick="cambiarModulo('panel')" id="btn-panel" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-600 text-white font-medium text-sm transition">
           📊 Panel Principal
-        </a>
-        <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white text-sm font-medium transition">
+        </button>
+        <button onclick="cambiarModulo('certificados')" id="btn-certificados" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white text-sm font-medium transition">
           📂 Certificados
-        </a>
-        <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white text-sm font-medium transition">
+        </button>
+        <button onclick="cambiarModulo('usuarios')" id="btn-usuarios" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white text-sm font-medium transition">
           👥 Usuarios
-        </a>
-        <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white text-sm font-medium transition">
+        </button>
+        <button onclick="cambiarModulo('configuracion')" id="btn-configuracion" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white text-sm font-medium transition">
           ⚙️ Configuración
-        </a>
+        </button>
       </nav>
     </div>
 
-    <!-- Footer Sidebar -->
     <div class="border-t border-slate-800 pt-4 px-3 text-xs text-slate-500">
       Sistema v1.0 • Producción
     </div>
   </aside>
 
-  <!-- 2. CONTENIDO PRINCIPAL -->
+  <!-- CONTENIDO PRINCIPAL -->
   <div class="flex-1 flex flex-col">
     
-    <!-- Topbar Header -->
     <header class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center">
-      <h2 class="text-xl font-bold text-slate-900">Panel de Control de Certificados</h2>
+      <h2 class="text-xl font-bold text-slate-900" id="titulo-modulo">Panel Principal</h2>
       <div class="flex items-center gap-3">
         <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
         <span class="text-sm font-medium text-slate-600">Sistema Activo</span>
       </div>
     </header>
 
-    <!-- Área de Trabajo -->
     <main class="p-8 space-y-8 overflow-y-auto">
 
-      <!-- Módulos de Métricas (Tarjetas de Control) -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Módulo 1 -->
-        <div class="bg-blue-600 text-white p-6 rounded-xl shadow-sm flex justify-between items-center">
-          <div>
-            <p class="text-xs uppercase font-bold tracking-wider text-blue-200">Total Certificados</p>
-            <h3 class="text-3xl font-extrabold mt-1" id="stat-total">--</h3>
+      <!-- MÓDULO 1: PANEL PRINCIPAL -->
+      <div id="modulo-panel" class="modulo-seccion activo space-y-8">
+        
+        <!-- Métricas -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-blue-600 text-white p-6 rounded-xl shadow-sm flex justify-between items-center">
+            <div>
+              <p class="text-xs uppercase font-bold tracking-wider text-blue-200">Total Certificados</p>
+              <h3 class="text-3xl font-extrabold mt-1" id="stat-total">0</h3>
+            </div>
+            <div class="text-4xl opacity-80">📄</div>
           </div>
-          <div class="text-4xl opacity-80">📄</div>
+
+          <div class="bg-amber-500 text-white p-6 rounded-xl shadow-sm flex justify-between items-center">
+            <div>
+              <p class="text-xs uppercase font-bold tracking-wider text-amber-100">Por Vencer (7 días)</p>
+              <h3 class="text-3xl font-extrabold mt-1" id="stat-pendientes">0</h3>
+            </div>
+            <div class="text-4xl opacity-80">⏳</div>
+          </div>
+
+          <div class="bg-emerald-600 text-white p-6 rounded-xl shadow-sm flex justify-between items-center">
+            <div>
+              <p class="text-xs uppercase font-bold tracking-wider text-emerald-100">Notificados</p>
+              <h3 class="text-3xl font-extrabold mt-1" id="stat-notificados">0</h3>
+            </div>
+            <div class="text-4xl opacity-80">✅</div>
+          </div>
         </div>
 
-        <!-- Módulo 2 -->
-        <div class="bg-amber-500 text-white p-6 rounded-xl shadow-sm flex justify-between items-center">
-          <div>
-            <p class="text-xs uppercase font-bold tracking-wider text-amber-100">Por Vencer (7 días)</p>
-            <h3 class="text-3xl font-extrabold mt-1" id="stat-pendientes">--</h3>
-          </div>
-          <div class="text-4xl opacity-80">⏳</div>
-        </div>
+        <!-- Formulario -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <h3 class="text-base font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">
+            ➕ Registrar Nuevo Certificado
+          </h3>
+          <form id="cert-form" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Nombre del Certificado</label>
+              <input type="text" id="nombre" placeholder="Ej. Licencia Software" required class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none text-sm">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Fecha de Creación</label>
+                <input type="date" id="fecha_creacion" required class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none text-sm">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Fecha de Vencimiento</label>
+                <input type="date" id="fecha_vencimiento" required class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none text-sm">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Correo Notificación</label>
+              <input type="email" id="email" placeholder="correo@ejemplo.com" required class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none text-sm">
+            </div>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg shadow transition text-sm">
+              Guardar Certificado
+            </button>
+          </form>
+        </section>
 
-        <!-- Módulo 3 -->
-        <div class="bg-emerald-600 text-white p-6 rounded-xl shadow-sm flex justify-between items-center">
-          <div>
-            <p class="text-xs uppercase font-bold tracking-wider text-emerald-100">Notificados</p>
-            <h3 class="text-3xl font-extrabold mt-1" id="stat-notificados">--</h3>
+        <!-- Tabla -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="p-6 border-b border-slate-100">
+            <h3 class="text-base font-bold text-slate-900">Listado de Certificados Registrados</h3>
           </div>
-          <div class="text-4xl opacity-80">✅</div>
-        </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold text-xs uppercase tracking-wider">
+                  <th class="py-3 px-6">Certificado</th>
+                  <th class="py-3 px-6">Vencimiento</th>
+                  <th class="py-3 px-6">Notificación</th>
+                </tr>
+              </thead>
+              <tbody id="cert-table-body" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </section>
       </div>
 
-      <!-- Formulario de Registro -->
-      <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <h3 class="text-base font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">
-          ➕ Registrar Nuevo Certificado
-        </h3>
+      <!-- MÓDULO 2: CERTIFICADOS -->
+      <div id="modulo-certificados" class="modulo-seccion bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <h3 class="text-lg font-bold text-slate-900 mb-2">Módulo de Certificados</h3>
+        <p class="text-sm text-slate-600">Vista detallada y filtros avanzados de certificados.</p>
+      </div>
 
-        <form id="cert-form" class="space-y-4">
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Nombre del Certificado</label>
-            <input type="text" id="nombre" placeholder="Ej. Licencia Software" required
-              class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none text-sm">
-          </div>
+      <!-- MÓDULO 3: USUARIOS -->
+      <div id="modulo-usuarios" class="modulo-seccion bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <h3 class="text-lg font-bold text-slate-900 mb-2">Gestión de Usuarios</h3>
+        <p class="text-sm text-slate-600">Administración de accesos y permisos del sistema.</p>
+      </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Fecha de Creación</label>
-              <input type="date" id="fecha_creacion" required
-                class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none text-sm">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Fecha de Vencimiento</label>
-              <input type="date" id="fecha_vencimiento" required
-                class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none text-sm">
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Correo Notificación</label>
-            <input type="email" id="email" placeholder="correo@ejemplo.com" required
-              class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none text-sm">
-          </div>
-
-          <button type="submit"
-            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg shadow transition text-sm">
-            Guardar Certificado
-          </button>
-        </form>
-      </section>
-
-      <!-- Tabla de Registros -->
-      <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="p-6 border-b border-slate-100">
-          <h3 class="text-base font-bold text-slate-900">Listado de Certificados Registrados</h3>
-        </div>
-
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse text-sm">
-            <thead>
-              <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold text-xs uppercase tracking-wider">
-                <th class="py-3 px-6">Certificado</th>
-                <th class="py-3 px-6">Vencimiento</th>
-                <th class="py-3 px-6">Notificación</th>
-              </tr>
-            </thead>
-            <tbody id="cert-table-body" class="divide-y divide-slate-100">
-              <!-- Tu app.js inyecta los datos aquí -->
-            </tbody>
-          </table>
-        </div>
-      </section>
+      <!-- MÓDULO 4: CONFIGURACIÓN -->
+      <div id="modulo-configuracion" class="modulo-seccion bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <h3 class="text-lg font-bold text-slate-900 mb-2">Configuración del Sistema</h3>
+        <p class="text-sm text-slate-600">Parámetros globales de alertas y correos SMTP.</p>
+      </div>
 
     </main>
   </div>
 
   <script src="app.js"></script>
+  <script>
+    // Función para alternar entre módulos visualmente
+    function cambiarModulo(modulo) {
+      // Ocultar todas las secciones
+      document.querySelectorAll('.modulo-seccion').forEach(sec => sec.classList.remove('activo'));
+      
+      // Quitar estilo activo de los botones
+      const botones = ['panel', 'certificados', 'usuarios', 'configuracion'];
+      botones.forEach(b => {
+        const btn = document.getElementById(`btn-${b}`);
+        btn.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white text-sm font-medium transition";
+      });
+
+      // Activar la sección seleccionada
+      document.getElementById(`modulo-${modulo}`).classList.add('activo');
+
+      // Resaltar botón seleccionado
+      const btnActivo = document.getElementById(`btn-${modulo}`);
+      btnActivo.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-600 text-white font-medium text-sm transition";
+
+      // Actualizar título de cabecera
+      const titulos = {
+        panel: 'Panel Principal',
+        certificados: 'Módulo de Certificados',
+        usuarios: 'Gestión de Usuarios',
+        configuracion: 'Configuración del Sistema'
+      };
+      document.getElementById('titulo-modulo').textContent = titulos[modulo];
+    }
+  </script>
 </body>
 </html>
