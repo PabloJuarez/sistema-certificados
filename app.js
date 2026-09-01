@@ -1,144 +1,186 @@
 const SUPABASE_URL = 'https://yizqjtuyfdfqlqspijgs.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_uAnHdms0QyDQq2HZjEs5Sg_7z4Vklt0';
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-let usuarioActual = null;
-let perfilActual = null;
-
-// ELEMENTOS DOM
-const loginContainer = document.getElementById('login-container');
-const appContainer = document.getElementById('app-container');
+const pantallaLogin = document.getElementById('pantalla-login');
+const pantallaApp = document.getElementById('pantalla-app');
 const loginForm = document.getElementById('login-form');
 const loginError = document.getElementById('login-error');
 
-// VERIFICAR SESIÓN AL CARGAR
-window.addEventListener('DOMContentLoaded', async () => {
-  const { data: { session } } = await supabaseClient.auth.getSession();
+const certForm = document.getElementById('cert-form');
+const certTableBody = document.getElementById('cert-table-body');
+const userForm = document.getElementById('user-form');
+const userTableBody = document.getElementById('user-table-body');
+
+let usuarioActualPerfil = null;
+
+// --- GESTIÓN DE AUTH & SESIÓN ---
+
+async function verificarSesion() {
+  const { data: { session } } = await _supabase.auth.getSession();
+
   if (session) {
-    usuarioActual = session.user;
-    await cargarPerfil();
-    mostrarApp();
+    pantallaLogin.classList.add('hidden');
+    pantallaApp.classList.remove('hidden');
+
+    // Obtener datos del perfil
+    const { data: perfil } = await _supabase.from('perfiles').select('*').eq('id', session.user.id).single();
+    usuarioActualPerfil = perfil || { nombre: session.user.email, rol: 'Operador' };
+
+    document.getElementById('user-display-email').textContent = usuarioActualPerfil.nombre || session.user.email;
+    document.getElementById('user-display-rol').textContent = usuarioActualPerfil.rol;
+
+    if (usuarioActualPerfil.rol !== 'Administrador') {
+      document.getElementById('nav-btn-usuarios').classList.add('hidden');
+    } else {
+      document.getElementById('nav-btn-usuarios').classList.remove('hidden');
+    }
+
+    cargarCertificados();
+    if (usuarioActualPerfil.rol === 'Administrador') cargarUsuarios();
   } else {
-    mostrarLogin();
+    pantallaLogin.classList.remove('hidden');
+    pantallaApp.classList.add('hidden');
   }
-});
+}
 
-// ESCUCHAR CAMBIOS DE ESTADO DE AUTH
-supabaseClient.auth.onAuthStateChange(async (event, session) => {
-  if (event === 'SIGNED_IN' && session) {
-    usuarioActual = session.user;
-    await cargarPerfil();
-    mostrarApp();
-  } else if (event === 'SIGNED_OUT') {
-    usuarioActual = null;
-    perfilActual = null;
-    mostrarLogin();
-  }
-});
-
-// INICIAR SESIÓN
 loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   loginError.classList.add('hidden');
   const email = document.getElementById('login-email').value;
   const password = document.getElementById('login-password').value;
 
-  const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  const { error } = await _supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    loginError.textContent = 'Correo o contraseña incorrectos.';
+    loginError.textContent = 'Credenciales inválidas. Revisa tu correo o contraseña.';
     loginError.classList.remove('hidden');
+  } else {
+    loginForm.reset();
+    verificarSesion();
   }
 });
 
-// CERRAR SESIÓN
 async function cerrarSesion() {
-  await supabaseClient.auth.signOut();
+  await _supabase.auth.signOut();
+  window.location.reload();
 }
 
-// CARGAR PERFIL DE USUARIO
-async function cargarPerfil() {
-  if (!usuarioActual) return;
-  const { data, error } = await supabaseClient
-    .from('perfiles')
-    .select('*')
-    .eq('id', usuarioActual.id)
-    .single();
+// --- GESTIÓN DE CERTIFICADOS ---
 
-  if (data) {
-    perfilActual = data;
-    document.getElementById('user-display-name').textContent = data.nombre || usuarioActual.email;
-    document.getElementById('user-display-role').textContent = data.rol;
-
-    if (data.rol === 'Administrador') {
-      document.getElementById('nav-usuarios').classList.remove('hidden');
-    } else {
-      document.getElementById('nav-usuarios').classList.add('hidden');
-    }
-  }
-}
-
-function mostrarLogin() {
-  loginContainer.classList.remove('hidden');
-  appContainer.classList.add('hidden');
-}
-
-function mostrarApp() {
-  loginContainer.classList.add('hidden');
-  appContainer.classList.remove('hidden');
-  cargarEstadisticas();
-  cargarCertificados();
-}
-
-// NAVEGACIÓN
-function cambiarSeccion(seccion) {
-  document.getElementById('sec-panel').classList.add('hidden');
-  document.getElementById('sec-certificados').classList.add('hidden');
-  document.getElementById('sec-usuarios').classList.add('hidden');
-
-  document.getElementById(`sec-${seccion}`).classList.remove('hidden');
-}
-
-// LÓGICA DE CERTIFICADOS
-document.getElementById('cert-form')?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const nombre = document.getElementById('cert-nombre').value;
-  const fecha_creacion = document.getElementById('cert-creacion').value;
-  const fecha_vencimiento = document.getElementById('cert-vencimiento').value;
-  const email_notificacion = document.getElementById('cert-email').value;
-
-  const { error } = await supabaseClient.from('certificados').insert([{
-    nombre, fecha_creacion, fecha_vencimiento, email_notificacion, estado: 'Activo'
-  }]);
-
-  if (!error) {
-    e.target.reset();
-    cargarEstadisticas();
-    cargarCertificados();
-    alert('Certificado guardado con éxito');
-  }
-});
-
-async function cargarEstadisticas() {
-  const { data } = await supabaseClient.from('certificados').select('*');
-  if (data) {
-    document.getElementById('stat-total').textContent = data.length;
-  }
+function actualizarTarjetas(data) {
+  document.getElementById('stat-total').textContent = data.length;
+  document.getElementById('stat-pendientes').textContent = data.filter(c => !c.notificado).length;
+  document.getElementById('stat-notificados').textContent = data.filter(c => c.notificado).length;
 }
 
 async function cargarCertificados() {
-  const { data } = await supabaseClient.from('certificados').select('*');
-  const tbody = document.getElementById('tabla-certificados');
-  if (!tbody || !data) return;
+  const { data, error } = await _supabase.from('certificados').select('*');
+  if (error) return console.error(error);
 
-  tbody.innerHTML = data.map(c => `
-    <tr class="border-b hover:bg-slate-50">
-      <td class="p-4 font-medium">${c.nombre}</td>
-      <td class="p-4 text-slate-500">${c.fecha_creacion}</td>
-      <td class="p-4 text-slate-500">${c.fecha_vencimiento}</td>
-      <td class="p-4 text-slate-500">${c.email_notificacion}</td>
-      <td class="p-4"><span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">${c.estado}</span></td>
-    </tr>
-  `).join('');
+  actualizarTarjetas(data);
+
+  if (certTableBody) {
+    certTableBody.innerHTML = data.map(c => `
+      <tr class="hover:bg-slate-50 transition">
+        <td class="py-3 px-6 font-medium text-slate-800">${c.nombre}</td>
+        <td class="py-3 px-6 text-slate-600">${c.fecha_vencimiento}</td>
+        <td class="py-3 px-6 text-slate-600">${c.email_notificacion || c.email || '-'}</td>
+        <td class="py-3 px-6">
+          ${c.notificado 
+            ? '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">✅ Enviado</span>' 
+            : '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">⏳ Pendiente</span>'}
+        </td>
+      </tr>
+    `).join('');
+  }
 }
+
+certForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const nuevoCertificado = {
+    nombre: document.getElementById('nombre').value,
+    fecha_creacion: document.getElementById('fecha_creacion').value,
+    fecha_vencimiento: document.getElementById('fecha_vencimiento').value,
+    email_notificacion: document.getElementById('email').value,
+    notificado: false
+  };
+
+  const { error } = await _supabase.from('certificados').insert([nuevoCertificado]);
+
+  if (!error) {
+    certForm.reset();
+    cargarCertificados();
+    alert('Certificado guardado con éxito.');
+  } else {
+    alert('Error al guardar en Supabase: ' + error.message);
+  }
+});
+
+// --- GESTIÓN DE USUARIOS ---
+
+async function cargarUsuarios() {
+  const { data: perfiles, error } = await _supabase.from('perfiles').select('*');
+  if (error) return console.error(error);
+
+  if (userTableBody) {
+    userTableBody.innerHTML = perfiles.map(u => `
+      <tr class="hover:bg-slate-50 transition">
+        <td class="py-3 px-6 font-medium text-slate-800">${u.nombre}</td>
+        <td class="py-3 px-6">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200">${u.rol}</span>
+        </td>
+      </tr>
+    `).join('');
+  }
+}
+
+userForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const nombre = document.getElementById('user-nombre').value;
+  const email = document.getElementById('user-email').value;
+  const rol = document.getElementById('user-rol').value;
+  const password = document.getElementById('user-pass').value;
+
+  const { data, error } = await _supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { nombre, rol } }
+  });
+
+  if (error) {
+    alert('Error al registrar usuario en Auth: ' + error.message);
+    return;
+  }
+
+  if (data?.user) {
+    await _supabase.from('perfiles').insert([{ id: data.user.id, nombre, rol }]);
+    userForm.reset();
+    cargarUsuarios();
+    alert('Usuario creado correctamente.');
+  }
+});
+
+// --- ACCIÓN MANUAL DE ALERTAS ---
+
+async function ejecutarChequeoManual() {
+  const btn = document.getElementById('btn-ejecutar-cron');
+  const textoOriginal = btn.innerHTML;
+
+  try {
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Procesando...';
+
+    const res = await fetch('/.netlify/functions/check-expirations');
+    const data = await res.text();
+
+    alert(data && data.trim() !== '' ? `Resultado: ${data}` : 'Alertas ejecutadas.');
+    window.location.reload();
+  } catch (err) {
+    alert('Error al conectar con la función de Netlify.');
+    btn.disabled = false;
+    btn.innerHTML = textoOriginal;
+  }
+}
+
+verificarSesion();

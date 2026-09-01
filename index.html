@@ -3,185 +3,273 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SIGECT - Gestión de Documentos</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>SIGECT - Control de Certificados</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800 min-h-screen">
+<body class="bg-slate-100 text-slate-800 min-h-screen">
 
   <!-- PANTALLA DE LOGIN -->
-  <div id="login-container" class="min-h-screen flex items-center justify-center bg-slate-900 p-4">
-    <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full space-y-6">
-      <div class="text-center">
-        <h1 class="text-3xl font-extrabold text-slate-800">SIGECT</h1>
-        <p class="text-slate-500 text-sm mt-1">Gestión de Documentos</p>
+  <div id="pantalla-login" class="flex items-center justify-center min-h-screen p-4 bg-slate-900">
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-md p-8">
+      <div class="text-center mb-8">
+        <div class="inline-flex bg-blue-600 text-white font-bold p-3 rounded-xl text-2xl mb-3">📜</div>
+        <h1 class="text-2xl font-bold text-slate-900">SIGECT</h1>
+        <p class="text-sm text-slate-500 mt-1">Ingresa tus credenciales para acceder al sistema</p>
       </div>
+
       <form id="login-form" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">Correo Electrónico</label>
-          <input type="email" id="login-email" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+          <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Correo Electrónico</label>
+          <input type="email" id="login-email" required placeholder="tu@correo.com" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none text-sm">
         </div>
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">Contraseña</label>
-          <input type="password" id="login-password" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+          <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Contraseña</label>
+          <input type="password" id="login-password" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none text-sm">
         </div>
-        <button type="submit" id="btn-login" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition-colors">
+
+        <div id="login-error" class="hidden text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg p-3"></div>
+
+        <button type="submit" id="btn-login" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg shadow transition text-sm">
           Iniciar Sesión
         </button>
       </form>
-      <div id="login-error" class="text-red-500 text-sm text-center hidden"></div>
     </div>
   </div>
 
-  <!-- PANEL PRINCIPAL (OCULTO POR DEFECTO) -->
-  <div id="app-container" class="hidden flex min-h-screen">
-    
-    <!-- Sidebar -->
-    <aside class="w-64 bg-slate-900 text-white flex flex-col justify-between p-4">
+  <!-- APLICACIÓN PRINCIPAL -->
+  <div id="pantalla-app" class="hidden flex min-h-screen">
+
+    <!-- BARRA LATERAL -->
+    <aside class="w-64 bg-slate-900 text-slate-300 min-h-screen flex flex-col justify-between p-4 flex-shrink-0">
       <div>
-        <div class="flex items-center space-x-3 mb-8 px-2">
-          <div class="bg-blue-600 p-2 rounded-lg">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-          </div>
+        <div class="flex items-center gap-3 px-3 py-4 border-b border-slate-800 mb-6">
+          <div class="bg-blue-600 text-white font-bold p-2 rounded-lg text-lg">📜</div>
           <div>
-            <h1 class="font-bold text-lg leading-tight">SIGECT</h1>
-            <span class="text-xs text-slate-400">Gestión de Documentos</span>
+            <h1 class="font-bold text-white tracking-wide">SIGECT</h1>
+            <p class="text-xs text-slate-500">Gestión de Documentos</p>
           </div>
         </div>
 
         <nav class="space-y-1">
-          <button id="nav-panel" onclick="cambiarSeccion('panel')" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg bg-blue-600 text-white font-medium">
-            <span>Panel Principal</span>
+          <button type="button" data-target="modulo-panel" class="btn-nav w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-600 text-white font-medium text-sm transition">
+            📊 Panel Principal
           </button>
-          <button id="nav-certificados" onclick="cambiarSeccion('certificados')" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white font-medium">
-            <span>Certificados</span>
+          <button type="button" data-target="modulo-certificados" class="btn-nav w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white text-sm font-medium transition">
+            📂 Certificados
           </button>
-          <button id="nav-usuarios" onclick="cambiarSeccion('usuarios')" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white font-medium hidden">
-            <span>👥 Usuarios</span>
+          <button type="button" id="nav-btn-usuarios" data-target="modulo-usuarios" class="btn-nav w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white text-sm font-medium transition">
+            👥 Usuarios
+          </button>
+          <button type="button" data-target="modulo-configuracion" class="btn-nav w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white text-sm font-medium transition">
+            ⚙️ Configuración
           </button>
         </nav>
       </div>
 
-      <!-- Usuario y Logout -->
-      <div class="border-t border-slate-800 pt-4 px-2">
-        <div class="flex items-center justify-between">
-          <div class="overflow-hidden pr-2">
-            <p id="user-display-name" class="text-sm font-medium text-white truncate">Usuario</p>
-            <p id="user-display-role" class="text-xs text-slate-400">Cargando...</p>
-          </div>
-          <button onclick="cerrarSesion()" title="Cerrar Sesión" class="text-slate-400 hover:text-red-400 p-1 rounded-lg">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-          </button>
+      <div class="border-t border-slate-800 pt-4 px-3 space-y-3">
+        <div class="text-xs">
+          <p class="text-slate-200 font-semibold truncate" id="user-display-email">cargando...</p>
+          <p class="text-slate-500 font-medium" id="user-display-rol">Operador</p>
         </div>
+        <button onclick="cerrarSesion()" class="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-red-400 text-xs font-semibold py-2 px-3 rounded-lg transition">
+          🚪 Cerrar Sesión
+        </button>
       </div>
     </aside>
 
-    <!-- Contenido Principal -->
-    <main class="flex-1 p-8 overflow-y-auto">
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="flex-1 flex flex-col">
       
-      <!-- Seccion Panel -->
-      <section id="sec-panel">
-        <h2 class="text-2xl font-bold mb-6">Panel Principal</h2>
+      <header class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center">
+        <h2 class="text-xl font-bold text-slate-900" id="header-titulo">Panel Principal</h2>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div class="bg-blue-600 text-white p-6 rounded-xl shadow-sm">
-            <p class="text-sm opacity-80 uppercase font-semibold">Total Certificados</p>
-            <p id="stat-total" class="text-4xl font-bold mt-2">0</p>
-          </div>
-          <div class="bg-amber-500 text-white p-6 rounded-xl shadow-sm">
-            <p class="text-sm opacity-80 uppercase font-semibold">Por Vencer (7 Días)</p>
-            <p id="stat-por-vencer" class="text-4xl font-bold mt-2">0</p>
-          </div>
-          <div class="bg-emerald-600 text-white p-6 rounded-xl shadow-sm">
-            <p class="text-sm opacity-80 uppercase font-semibold">Notificados</p>
-            <p id="stat-notificados" class="text-4xl font-bold mt-2">0</p>
+        <div class="flex items-center gap-4">
+          <button id="btn-ejecutar-cron" onclick="ejecutarChequeoManual()" 
+            class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold py-2 px-3.5 rounded-lg shadow-sm transition">
+            ⚡ Ejecutar Alertas
+          </button>
+
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+            <span class="text-sm font-medium text-slate-600">Sistema Activo</span>
           </div>
         </div>
+      </header>
 
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-          <h3 class="text-lg font-bold mb-4">Registrar Nuevo Certificado</h3>
-          <form id="cert-form" class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-slate-700 mb-1">Nombre del Certificado</label>
-              <input type="text" id="cert-nombre" required class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <main class="p-8 flex-1">
+
+        <!-- MÓDULO 1: PANEL PRINCIPAL -->
+        <div id="modulo-panel" class="seccion-modulo space-y-8">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-blue-600 text-white p-6 rounded-xl shadow-sm flex justify-between items-center">
               <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Fecha de Creación</label>
-                <input type="date" id="cert-creacion" required class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                <p class="text-xs uppercase font-bold tracking-wider text-blue-200">Total Certificados</p>
+                <h3 class="text-3xl font-extrabold mt-1" id="stat-total">0</h3>
+              </div>
+              <div class="text-4xl opacity-80">📄</div>
+            </div>
+
+            <div class="bg-amber-500 text-white p-6 rounded-xl shadow-sm flex justify-between items-center">
+              <div>
+                <p class="text-xs uppercase font-bold tracking-wider text-amber-100">Por Vencer (7 días)</p>
+                <h3 class="text-3xl font-extrabold mt-1" id="stat-pendientes">0</h3>
+              </div>
+              <div class="text-4xl opacity-80">⏳</div>
+            </div>
+
+            <div class="bg-emerald-600 text-white p-6 rounded-xl shadow-sm flex justify-between items-center">
+              <div>
+                <p class="text-xs uppercase font-bold tracking-wider text-emerald-100">Notificados</p>
+                <h3 class="text-3xl font-extrabold mt-1" id="stat-notificados">0</h3>
+              </div>
+              <div class="text-4xl opacity-80">✅</div>
+            </div>
+          </div>
+
+          <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h3 class="text-base font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">
+              ➕ Registrar Nuevo Certificado
+            </h3>
+            <form id="cert-form" class="space-y-4">
+              <div>
+                <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Nombre del Certificado</label>
+                <input type="text" id="nombre" placeholder="Ej. Licencia Software" required class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none text-sm">
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Fecha de Creación</label>
+                  <input type="date" id="fecha_creacion" required class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none text-sm">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Fecha de Vencimiento</label>
+                  <input type="date" id="fecha_vencimiento" required class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none text-sm">
+                </div>
               </div>
               <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Fecha de Vencimiento</label>
-                <input type="date" id="cert-vencimiento" required class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Correo Notificación</label>
+                <input type="email" id="email" placeholder="correo@ejemplo.com" required class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none text-sm">
               </div>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-slate-700 mb-1">Correo Notificación</label>
-              <input type="email" id="cert-email" required class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700">Guardar Certificado</button>
-          </form>
+              <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg shadow transition text-sm">
+                Guardar Certificado
+              </button>
+            </form>
+          </section>
         </div>
-      </section>
 
-      <!-- Seccion Certificados -->
-      <section id="sec-certificados" class="hidden">
-        <h2 class="text-2xl font-bold mb-6">Lista de Certificados</h2>
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <table class="w-full text-left border-collapse">
-            <thead class="bg-slate-50 border-b">
-              <tr>
-                <th class="p-4 font-semibold text-sm">Nombre</th>
-                <th class="p-4 font-semibold text-sm">Creación</th>
-                <th class="p-4 font-semibold text-sm">Vencimiento</th>
-                <th class="p-4 font-semibold text-sm">Notificar a</th>
-                <th class="p-4 font-semibold text-sm">Estado</th>
-              </tr>
-            </thead>
-            <tbody id="tabla-certificados">
-              <!-- Carga dinámica -->
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Seccion Usuarios (Solo Admins) -->
-      <section id="sec-usuarios" class="hidden">
-        <h2 class="text-2xl font-bold mb-6">Gestión de Usuarios</h2>
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-6">
-          <h3 class="text-lg font-bold mb-4">Registrar Nuevo Usuario</h3>
-          <form id="user-form" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Nombre Completo</label>
-                <input type="text" id="new-user-name" required class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Correo Electrónico</label>
-                <input type="email" id="new-user-email" required class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
-              </div>
+        <!-- MÓDULO 2: CERTIFICADOS -->
+        <div id="modulo-certificados" class="seccion-modulo hidden space-y-6">
+          <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-6 border-b border-slate-100">
+              <h3 class="text-base font-bold text-slate-900">Listado de Certificados Registrados</h3>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Contraseña</label>
-                <input type="password" id="new-user-password" required minlength="6" class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Rol</label>
-                <select id="new-user-role" class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
-                  <option value="Operador">Operador</option>
-                  <option value="Administrador">Administrador</option>
-                </select>
-              </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold text-xs uppercase tracking-wider">
+                    <th class="py-3 px-6">Certificado</th>
+                    <th class="py-3 px-6">Vencimiento</th>
+                    <th class="py-3 px-6">Correo Notificación</th>
+                    <th class="py-3 px-6">Estado</th>
+                  </tr>
+                </thead>
+                <tbody id="cert-table-body" class="divide-y divide-slate-100"></tbody>
+              </table>
             </div>
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700">Crear Usuario</button>
-          </form>
+          </section>
         </div>
-      </section>
 
-    </main>
+        <!-- MÓDULO 3: USUARIOS -->
+        <div id="modulo-usuarios" class="seccion-modulo hidden space-y-8">
+          <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h3 class="text-base font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">
+              👤 Registrar Nuevo Usuario en el Sistema
+            </h3>
+            <form id="user-form" class="space-y-4">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Nombre Completo</label>
+                  <input type="text" id="user-nombre" placeholder="Ej. Juan Pérez" required class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none text-sm">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Correo Electrónico</label>
+                  <input type="email" id="user-email" placeholder="usuario@ejemplo.com" required class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none text-sm">
+                </div>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Rol de Acceso</label>
+                  <select id="user-rol" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none text-sm bg-white">
+                    <option value="Operador">Operador</option>
+                    <option value="Administrador">Administrador</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Contraseña</label>
+                  <input type="password" id="user-pass" placeholder="Mínimo 6 caracteres" required minlength="6" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none text-sm">
+                </div>
+              </div>
+              <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg shadow transition text-sm">
+                Crear Usuario Acceso
+              </button>
+            </form>
+          </section>
+
+          <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-6 border-b border-slate-100">
+              <h3 class="text-base font-bold text-slate-900">Usuarios Registrados</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold text-xs uppercase tracking-wider">
+                    <th class="py-3 px-6">Nombre</th>
+                    <th class="py-3 px-6">Rol</th>
+                  </tr>
+                </thead>
+                <tbody id="user-table-body" class="divide-y divide-slate-100"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+
+        <!-- MÓDULO 4: CONFIGURACIÓN -->
+        <div id="modulo-configuracion" class="seccion-modulo hidden bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+          <h3 class="text-lg font-bold text-slate-900 mb-2">⚙️ Configuración del Sistema</h3>
+          <p class="text-sm text-slate-600">Ajustes globales y frecuencia de alertas enviadas a Netlify Function.</p>
+        </div>
+
+      </main>
+    </div>
   </div>
 
   <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const navButtons = document.querySelectorAll('.btn-nav');
+      const modulos = document.querySelectorAll('.seccion-modulo');
+      const headerTitulo = document.getElementById('header-titulo');
+
+      navButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetId = btn.getAttribute('data-target');
+
+          modulos.forEach(mod => mod.classList.add('hidden'));
+          document.getElementById(targetId).classList.remove('hidden');
+
+          navButtons.forEach(b => {
+            b.className = "btn-nav w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white text-sm font-medium transition";
+          });
+
+          btn.className = "btn-nav w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-600 text-white font-medium text-sm transition";
+          headerTitulo.textContent = btn.innerText.trim();
+        });
+      });
+    });
+  </script>
 </body>
 </html>
