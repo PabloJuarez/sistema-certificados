@@ -5,7 +5,7 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const form = document.getElementById('cert-form');
 const tableBody = document.getElementById('cert-table-body');
 
-// Función para actualizar las métricas del panel superior
+// 1. Función para actualizar las tarjetas de métricas
 function actualizarTarjetas(data) {
   const total = data.length;
   const pendientes = data.filter(c => !c.notificado).length;
@@ -16,14 +16,13 @@ function actualizarTarjetas(data) {
   document.getElementById('stat-notificados').textContent = notificados;
 }
 
+// 2. Cargar registros y renderizar en la tabla
 async function cargarCertificados() {
   const { data, error } = await _supabase.from('certificados').select('*');
   if (error) return console.error(error);
 
-  // 1. Actualiza los contadores de las tarjetas de color
   actualizarTarjetas(data);
 
-  // 2. Renderiza la tabla con los registros
   tableBody.innerHTML = data.map(c => `
     <tr class="hover:bg-slate-50 transition">
       <td class="py-3 px-6 font-medium text-slate-800">${c.nombre}</td>
@@ -37,6 +36,7 @@ async function cargarCertificados() {
   `).join('');
 }
 
+// 3. Registrar un nuevo certificado
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   const nuevoCertificado = {
@@ -55,4 +55,28 @@ form.addEventListener('submit', async (e) => {
   }
 });
 
+// 4. Ejecutar chequeo manual llamando a la Netlify Function desde el botón
+async function ejecutarChequeoManual() {
+  const btn = document.getElementById('btn-ejecutar-cron');
+  const textoOriginal = btn.innerHTML;
+
+  try {
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Procesando...';
+
+    const res = await fetch('/.netlify/functions/check-expirations');
+    const data = await res.text();
+
+    alert(`Respuesta del servidor: ${data}`);
+    cargarCertificados();
+  } catch (error) {
+    console.error('Error al ejecutar la función:', error);
+    alert('Hubo un error al intentar enviar las alertas.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = textoOriginal;
+  }
+}
+
+// Inicializar la carga de datos
 cargarCertificados();

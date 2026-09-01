@@ -13,7 +13,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex">
 
-  <!-- SIDEBAR -->
+  <!-- BARRA LATERAL / SIDEBAR -->
   <aside class="w-64 bg-slate-900 text-slate-300 min-h-screen flex flex-col justify-between p-4 flex-shrink-0">
     <div>
       <div class="flex items-center gap-3 px-3 py-4 border-b border-slate-800 mb-6">
@@ -24,7 +24,7 @@
         </div>
       </div>
 
-      <!-- Menú con listeners asignados directamente -->
+      <!-- Menú de Módulos Interactivos -->
       <nav class="space-y-1">
         <button type="button" data-target="modulo-panel" class="btn-nav w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-600 text-white font-medium text-sm transition">
           📊 Panel Principal
@@ -46,14 +46,23 @@
     </div>
   </aside>
 
-  <!-- CONTENIDO -->
+  <!-- CONTENIDO PRINCIPAL -->
   <div class="flex-1 flex flex-col">
     
     <header class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center">
       <h2 class="text-xl font-bold text-slate-900" id="header-titulo">Panel Principal</h2>
-      <div class="flex items-center gap-3">
-        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-        <span class="text-sm font-medium text-slate-600">Sistema Activo</span>
+      
+      <div class="flex items-center gap-4">
+        <!-- Botón para ejecutar el chequeo manual -->
+        <button id="btn-ejecutar-cron" onclick="ejecutarChequeoManual()" 
+          class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold py-2 px-3.5 rounded-lg shadow-sm transition">
+          ⚡ Ejecutar Alertas
+        </button>
+
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          <span class="text-sm font-medium text-slate-600">Sistema Activo</span>
+        </div>
       </div>
     </header>
 
@@ -61,6 +70,7 @@
 
       <!-- MÓDULO 1: PANEL PRINCIPAL -->
       <div id="modulo-panel" class="seccion-modulo space-y-8">
+        
         <!-- Tarjetas Métricas -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="bg-blue-600 text-white p-6 rounded-xl shadow-sm flex justify-between items-center">
@@ -138,22 +148,20 @@
         </section>
       </div>
 
-      <!-- MÓDULO 2: CERTIFICADOS -->
+      <!-- MÓDULOS SECUNDARIOS -->
       <div id="modulo-certificados" class="seccion-modulo hidden bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
         <h3 class="text-lg font-bold text-slate-900 mb-2">📂 Módulo de Certificados</h3>
-        <p class="text-sm text-slate-600">Aquí podrás ver reportes detallados y descargar el historial de certificados.</p>
+        <p class="text-sm text-slate-600">Vista detallada y reportes de certificados.</p>
       </div>
 
-      <!-- MÓDULO 3: USUARIOS -->
       <div id="modulo-usuarios" class="seccion-modulo hidden bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
         <h3 class="text-lg font-bold text-slate-900 mb-2">👥 Gestión de Usuarios</h3>
-        <p class="text-sm text-slate-600">Administra los accesos de los usuarios del sistema.</p>
+        <p class="text-sm text-slate-600">Administración de accesos del sistema.</p>
       </div>
 
-      <!-- MÓDULO 4: CONFIGURACIÓN -->
       <div id="modulo-configuracion" class="seccion-modulo hidden bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
         <h3 class="text-lg font-bold text-slate-900 mb-2">⚙️ Configuración del Sistema</h3>
-        <p class="text-sm text-slate-600">Ajusta los parámetros globales de envío de correos y alertas.</p>
+        <p class="text-sm text-slate-600">Ajustes globales de notificaciones.</p>
       </div>
 
     </main>
@@ -161,7 +169,7 @@
 
   <script src="app.js"></script>
   <script>
-    // Script JS dedicado exclusivamente al cambio de vistas sin interferencias
+    // Navegación entre pestañas de módulos
     document.addEventListener('DOMContentLoaded', () => {
       const navButtons = document.querySelectorAll('.btn-nav');
       const modulos = document.querySelectorAll('.seccion-modulo');
@@ -171,21 +179,14 @@
         btn.addEventListener('click', () => {
           const targetId = btn.getAttribute('data-target');
 
-          // Ocultar todas las secciones
           modulos.forEach(mod => mod.classList.add('hidden'));
-
-          // Mostrar la sección seleccionada
           document.getElementById(targetId).classList.remove('hidden');
 
-          // Resetear estilos de botones
           navButtons.forEach(b => {
             b.className = "btn-nav w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white text-sm font-medium transition";
           });
 
-          // Estilo activo al botón clickeado
           btn.className = "btn-nav w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-600 text-white font-medium text-sm transition";
-
-          // Actualizar título del header
           headerTitulo.textContent = btn.innerText.trim();
         });
       });
