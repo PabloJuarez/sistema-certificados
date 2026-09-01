@@ -37,7 +37,7 @@ async function verificarSesion() {
     const navConfiguracion = document.getElementById('nav-btn-configuracion');
 
     if (usuarioActualPerfil.rol === 'Administrador') {
-      // Mostrar todo al administrador
+      // El Administrador ve todas las secciones
       if (navPanel) navPanel.classList.remove('hidden');
       if (navUsuarios) navUsuarios.classList.remove('hidden');
       if (navConfiguracion) navConfiguracion.classList.remove('hidden');
@@ -47,7 +47,7 @@ async function verificarSesion() {
       cargarCertificados();
       cargarUsuarios();
     } else {
-      // El operador se queda únicamente con Certificados (los demás botones ya están ocultos por el HTML)
+      // El Operador SÓLO ve Certificados (botones panel, usuarios y configuración siguen ocultos por el HTML)
       if (contenedorFormCert) contenedorFormCert.classList.add('hidden');
 
       if (navCertificados) navCertificados.click();
